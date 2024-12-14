@@ -1,82 +1,23 @@
-# CollabDraw
+# Simple Chat with Tic Tac Toe
 
-A collaborative drawing application with real-time chat functionality, built using Java and Swing.
+## How To Setup The Program
 
-## Features
+1. npm install
 
-- Real-time collaborative drawing
-- Chat functionality
-- Multiple drawing tools
-- Color picker
-- Stroke size adjustment
-- Save/load drawings
-- User authentication
-- Persistent chat history
+2. npm start
 
-## Prerequisites
+3. open localhost:3000
 
-- Java 17 or higher
-- Maven 3.6 or higher
-- MySQL 8.0 or higher
+## How To Test The Program
 
-## Installation
+1. Open 2 Browser
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/collabdraw.git
-cd collabdraw
-```
+2. Each Browser input different names
 
-2. Set up the database:
-```bash
-mysql -u root -p < docs/database/schema.sql
-```
+3. Voila!
 
-3. Configure the application:
-- Edit `config/server.properties` for server settings
-- Edit `config/client.properties` for client settings
+###
 
-4. Build the project:
-```bash
-./scripts/build.sh
-```
+* You can invite other users to play Tic Tac Toe who are online
 
-## Running the Application
-
-1. Start the server:
-```bash
-./scripts/run-server.sh
-```
-
-2. Start the client:
-```bash
-./scripts/run-client.sh
-```
-
-## Project Structure
-
-```
-CollabDraw/
-├── src/                    # Source files
-├── config/                 # Configuration files
-├── docs/                   # Documentation
-├── scripts/                # Build and run scripts
-└── build/                  # Compiled files
-```
-
-## Development
-
-- Use `mvn test` to run tests
-- Use `mvn javadoc:javadoc` to generate documentation
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+* The first turn of the Tic Tac Toe, is the user who invites the other user
