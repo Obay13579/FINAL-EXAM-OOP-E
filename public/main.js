@@ -150,8 +150,21 @@ function acceptGame(inviter) {
 socket.on('start-game', (gameData) => {
     currentGame = gameData;
     document.getElementById('game-area').style.display = 'block';
-    document.getElementById('game-status').textContent = `Game between ${gameData.players[0]} and ${gameData.players[1]}`;
-    document.getElementById('player-symbol').textContent = `Your symbol: ${gameData.playerSymbols[currentUsername]}`;
+    
+    // Check if current user is a player
+    const isPlayer = gameData.players.includes(currentUsername);
+    
+    if (isPlayer) {
+        const initialStatus = gameData.currentPlayer === currentUsername 
+            ? 'Current Turn: **You**' 
+            : `Current Turn: ${gameData.currentPlayer}`;
+        document.getElementById('game-status').innerHTML = initialStatus.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        document.getElementById('player-symbol').textContent = `Your symbol: ${gameData.playerSymbols[currentUsername]}`;
+    } else {
+        // Spectator view
+        document.getElementById('game-status').textContent = `Current Turn: ${gameData.currentPlayer}`;
+        document.getElementById('player-symbol').textContent = `Spectating`;
+    }
     resetBoard();
 });
 
@@ -164,8 +177,9 @@ cells.forEach(cell => {
 function handleCellClick(cell) {
     const index = cell.getAttribute('data-index');
     
-    // Only allow move if it's the current user's turn and the cell is empty
+    // Only allow move if it's a player's turn and the cell is empty
     if (currentGame && 
+        currentGame.players.includes(currentUsername) && // Check if user is a player
         currentUsername === currentGame.currentPlayer && 
         !cell.textContent) {
         socket.emit('game-move', {
@@ -180,7 +194,20 @@ socket.on('update-game', (gameData) => {
     if (currentGame && gameData.gameId === currentGame.gameId) {
         currentGame = { ...currentGame, ...gameData };
         updateBoard(gameData.board);
-        document.getElementById('game-status').textContent = `Current Turn: ${gameData.currentPlayer}`;
+        
+        // Check if current user is a player in the game
+        const isPlayer = currentGame.players.includes(currentUsername);
+        
+        if (isPlayer) {
+            // Update turn display based on current player
+            const statusText = gameData.currentPlayer === currentUsername 
+                ? 'Current Turn: **You**' 
+                : `Current Turn: ${gameData.currentPlayer}`;
+            document.getElementById('game-status').innerHTML = statusText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        } else {
+            // Spectator view
+            document.getElementById('game-status').textContent = `Current Turn: ${gameData.currentPlayer}`;
+        }
     }
 });
 
@@ -193,18 +220,19 @@ function resetBoard() {
 
 socket.on('game-over', (gameData) => {
     if (currentGame && gameData.gameId === currentGame.gameId) {
-        // Ensure the final board state is updated before processing game over
         const finalBoard = [...currentGame.board];
         if (gameData.winningMove !== undefined) {
             finalBoard[gameData.winningMove] = gameData.winnerSymbol;
         }
         
-        // Update the board with the final state, including the last move
         updateBoard(finalBoard);
         
         const messages = document.getElementById('messages');
         const gameOverDiv = document.createElement('div');
         gameOverDiv.className = 'system-message game-over';
+        
+        // Check if current user is a player
+        const isPlayer = currentGame.players.includes(currentUsername);
         
         if (gameData.winner === 'Draw') {
             gameOverDiv.textContent = 'Game is a Draw! Both players played well.';
@@ -212,19 +240,24 @@ socket.on('game-over', (gameData) => {
         } else {
             const isCurrentUserWinner = gameData.players.winner === currentUsername;
             
-            // Highlight the winning move
             if (gameData.winningMove !== undefined) {
                 const winningCell = document.querySelector(`.cell[data-index="${gameData.winningMove}"]`);
                 winningCell.classList.add('winning-cell');
             }
             
-            gameOverDiv.textContent = isCurrentUserWinner 
-                ? 'Congratulations! You won the game!' 
-                : `${gameData.players.winner} won the game!`;
-            
-            document.getElementById('game-status').textContent = isCurrentUserWinner 
-                ? 'You won!' 
-                : `${gameData.players.winner} wins!`;
+            if (isPlayer) {
+                gameOverDiv.textContent = isCurrentUserWinner 
+                    ? 'Congratulations! You won the game!' 
+                    : `${gameData.players.winner} won the game!`;
+                
+                document.getElementById('game-status').innerHTML = isCurrentUserWinner 
+                    ? '<strong>You won!</strong>' 
+                    : `${gameData.players.winner} wins!`;
+            } else {
+                // Spectator view
+                gameOverDiv.textContent = `${gameData.players.winner} won the game!`;
+                document.getElementById('game-status').textContent = `${gameData.players.winner} wins!`;
+            }
         }
         
         messages.appendChild(gameOverDiv);
@@ -232,10 +265,9 @@ socket.on('game-over', (gameData) => {
         
         setTimeout(() => {
             document.getElementById('game-area').style.display = 'none';
-            resetBoard(); // Use the modified resetBoard function
+            resetBoard();
             currentGame = null;
             
-            // Explicitly remove winning cell class from all cells
             document.querySelectorAll('.cell').forEach(cell => {
                 cell.classList.remove('winning-cell');
             });
