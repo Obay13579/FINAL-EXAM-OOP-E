@@ -28,6 +28,36 @@ body {
     border-right: 1px solid #ddd;
 }
 
+#users-list li {
+    margin-bottom: 10px;
+}
+
+.user-list-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #f0f0f0;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.user-list-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.user-list-btn.invite-hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.user-list-btn:disabled {
+    background-color: #cccccc;
+    color: #666;
+    cursor: not-allowed;
+}
+
 #users {
     list-style: none;
     padding: 0;

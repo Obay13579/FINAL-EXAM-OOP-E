@@ -58,18 +58,49 @@ socket.on('userList', (users) => {
     const usersList = document.getElementById('users');
     usersList.innerHTML = '';
     users.forEach(user => {
-        // Don't show invite button for the current user
+        // Don't show button for the current user
         if (user !== currentUsername) {
             const li = document.createElement('li');
-            li.textContent = user;
             
-            // Create invite button for each user
-            const inviteBtn = document.createElement('button');
-            inviteBtn.textContent = 'Invite to Game';
-            inviteBtn.classList.add('game-invite-btn');
-            inviteBtn.onclick = () => inviteToGame(user);
+            // Create interactive button for each user
+            const userBtn = document.createElement('button');
+            userBtn.textContent = user;
+            userBtn.classList.add('user-list-btn');
             
-            li.appendChild(inviteBtn);
+            // Hover states
+            userBtn.addEventListener('mouseenter', (e) => {
+                if (!userBtn.disabled) {
+                    userBtn.textContent = 'Invite to Game';
+                    userBtn.classList.add('invite-hover');
+                }
+            });
+            
+            userBtn.addEventListener('mouseleave', (e) => {
+                if (!userBtn.disabled) {
+                    userBtn.textContent = user;
+                    userBtn.classList.remove('invite-hover');
+                }
+            });
+            
+            // Click to invite
+            userBtn.addEventListener('click', () => {
+                const originalText = user;
+                
+                // Disable the button and change text
+                userBtn.textContent = 'Sending invite...';
+                userBtn.disabled = true;
+                
+                // Emit the invite
+                socket.emit('invite-game', user);
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    userBtn.textContent = originalText;
+                    userBtn.disabled = false;
+                }, 3000);
+            });
+            
+            li.appendChild(userBtn);
             usersList.appendChild(li);
         }
     });
