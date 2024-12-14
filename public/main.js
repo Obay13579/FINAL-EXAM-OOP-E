@@ -77,7 +77,21 @@ socket.on('userList', (users) => {
 
 // New game-related functions
 function inviteToGame(opponent) {
+    const inviteBtn = event.target;
+    const originalText = inviteBtn.textContent;
+    
+    // Disable the button and change text
+    inviteBtn.textContent = 'Sending invite...';
+    inviteBtn.disabled = true;
+    
+    // Emit the invite
     socket.emit('invite-game', opponent);
+    
+    // Reset button after 3 seconds
+    setTimeout(() => {
+        inviteBtn.textContent = originalText;
+        inviteBtn.disabled = false;
+    }, 3000);
 }
 
 socket.on('game-invitation', (data) => {
