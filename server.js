@@ -71,7 +71,9 @@ io.on('connection', (socket) => {
                     players: {
                         winner: winner === 'Draw' ? null : winner,
                         loser: winner === 'Draw' ? null : loser
-                    }
+                    },
+                    winnerSymbol: playerSymbol, // Add the winning symbol
+                    winningMove: index // Add the index of the winning move
                 });
                 delete games[gameId];
             } else {

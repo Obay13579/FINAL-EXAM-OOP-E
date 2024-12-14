@@ -186,6 +186,15 @@ socket.on('update-game', (gameData) => {
 
 socket.on('game-over', (gameData) => {
     if (currentGame && gameData.gameId === currentGame.gameId) {
+        // Ensure the final board state is updated before processing game over
+        const finalBoard = [...currentGame.board];
+        if (gameData.winningMove !== undefined) {
+            finalBoard[gameData.winningMove] = gameData.winnerSymbol;
+        }
+        
+        // Update the board with the final state, including the last move
+        updateBoard(finalBoard);
+        
         const messages = document.getElementById('messages');
         const gameOverDiv = document.createElement('div');
         gameOverDiv.className = 'system-message game-over';
@@ -195,6 +204,13 @@ socket.on('game-over', (gameData) => {
             document.getElementById('game-status').textContent = 'Game is a Draw!';
         } else {
             const isCurrentUserWinner = gameData.players.winner === currentUsername;
+            
+            // Highlight the winning move
+            if (gameData.winningMove !== undefined) {
+                const winningCell = document.querySelector(`.cell[data-index="${gameData.winningMove}"]`);
+                winningCell.classList.add('winning-cell');
+            }
+            
             gameOverDiv.textContent = isCurrentUserWinner 
                 ? 'Congratulations! You won the game!' 
                 : `${gameData.players.winner} won the game!`;
