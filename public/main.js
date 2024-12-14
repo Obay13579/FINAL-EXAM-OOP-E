@@ -184,6 +184,13 @@ socket.on('update-game', (gameData) => {
     }
 });
 
+function resetBoard() {
+    cells.forEach(cell => {
+        cell.textContent = ''; // Clear cell text
+        cell.classList.remove('winning-cell'); // Remove winning cell highlight
+    });
+}
+
 socket.on('game-over', (gameData) => {
     if (currentGame && gameData.gameId === currentGame.gameId) {
         // Ensure the final board state is updated before processing game over
@@ -225,7 +232,13 @@ socket.on('game-over', (gameData) => {
         
         setTimeout(() => {
             document.getElementById('game-area').style.display = 'none';
+            resetBoard(); // Use the modified resetBoard function
             currentGame = null;
+            
+            // Explicitly remove winning cell class from all cells
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.classList.remove('winning-cell');
+            });
         }, 3000);
     }
 });
