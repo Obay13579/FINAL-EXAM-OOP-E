@@ -197,3 +197,42 @@ button:hover {
     background-color: #4CAF50;
     color: white;
 }
+
+.system-message.error {
+    color: red;
+    font-weight: bold;
+    background-color: #ffe0e0;
+    padding: 5px;
+    border: 1px solid red;
+    border-radius: 4px;
+}
+
+.system-message.error {
+    color: red;
+    font-weight: bold;
+    background-color: #ffe0e0;
+    padding: 5px;
+    border: 1px solid red;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.system-message.warning {
+    color: orange;
+    font-weight: bold;
+    background-color: #fff4e5;
+    padding: 5px;
+    border: 1px solid orange;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.system-message.success {
+    color: green;
+    font-weight: bold;
+    background-color: #eaffea;
+    padding: 5px;
+    border: 1px solid green;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}

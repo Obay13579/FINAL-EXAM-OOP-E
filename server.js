@@ -34,6 +34,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('accept-game', (inviter) => {
+        // Validasi apakah inviter masih online
+        if (!users.has(inviter)) {
+            socket.emit('error-message', 'The inviter has left the chat. Game cannot be started.');
+            return;
+        }
+    
         const gameId = `game_${inviter}_${socket.username}`;
         games[gameId] = {
             players: [inviter, socket.username],
@@ -45,6 +51,7 @@ io.on('connection', (socket) => {
             currentPlayer: inviter,
             winner: null
         };
+    
         io.emit('start-game', { 
             gameId, 
             players: [inviter, socket.username],
@@ -92,12 +99,43 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         if (socket.username) {
+            // Hapus undangan terkait pengguna ini
+            Object.keys(games).forEach((gameId) => {
+                if (games[gameId].players.includes(socket.username)) {
+                    delete games[gameId];
+                    io.emit('game-over', { gameId, reason: `${socket.username} has left the game.` });
+                }
+            });
+    
             users.delete(socket.username);
             io.emit('userLeft', socket.username);
             io.emit('userList', Array.from(users));
         }
         console.log('A user disconnected');
     });
+
+socket.on('connect_error', (error) => {
+    console.error('Failed to connect to server.', error);
+    const messages = document.getElementById('messages');
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'system-message error';
+    errorDiv.textContent = 'Failed to connect to server. Please try again later.';
+    messages.appendChild(errorDiv);
+});
+});
+
+// Handle HTTP server errors
+http.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+        console.error('Port is already in use.');
+    } else {
+        console.error('HTTP Server Error:', error);
+    }
+});
+
+// Handle Socket.IO server errors
+io.on('error', (error) => {
+    console.error('Socket.IO Server Error:', error);
 });
 
 function checkWinner(board) {

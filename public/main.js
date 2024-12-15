@@ -28,6 +28,72 @@ document.getElementById('message-input')?.addEventListener('keypress', (e) => {
     }
 });
 
+// Handle successful connection
+socket.on('connect', () => {
+    console.log('Connected to server.');
+    const messages = document.getElementById('messages');
+    const reconnectDiv = document.createElement('div');
+    reconnectDiv.className = 'system-message success';
+    reconnectDiv.textContent = 'Connected to server!';
+    messages.appendChild(reconnectDiv);
+    messages.scrollTop = messages.scrollHeight;
+});
+
+// Handle connection error
+socket.on('connect_error', (error) => {
+    console.error('Failed to connect to server.', error);
+    const messages = document.getElementById('messages');
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'system-message error';
+    errorDiv.textContent = 'Failed to connect to server. Please try again later.';
+    messages.appendChild(errorDiv);
+    messages.scrollTop = messages.scrollHeight;
+});
+
+// Handle disconnection
+socket.on('disconnect', (reason) => {
+    console.warn(`Disconnected from server: ${reason}`);
+    const messages = document.getElementById('messages');
+    const warningDiv = document.createElement('div');
+    warningDiv.className = 'system-message warning';
+    warningDiv.textContent = 'Lost connection to the server. Attempting to reconnect...';
+    messages.appendChild(warningDiv);
+    messages.scrollTop = messages.scrollHeight;
+});
+
+// Handle reconnection attempts
+socket.on('reconnect_attempt', (attemptNumber) => {
+    console.log(`Reconnection attempt ${attemptNumber}`);
+    const messages = document.getElementById('messages');
+    const reconnectAttemptDiv = document.createElement('div');
+    reconnectAttemptDiv.className = 'system-message warning';
+    reconnectAttemptDiv.textContent = `Reconnection attempt ${attemptNumber}...`;
+    messages.appendChild(reconnectAttemptDiv);
+    messages.scrollTop = messages.scrollHeight;
+});
+
+// Handle reconnection success
+socket.on('reconnect', () => {
+    console.log('Reconnected to server.');
+    const messages = document.getElementById('messages');
+    const reconnectDiv = document.createElement('div');
+    reconnectDiv.className = 'system-message success';
+    reconnectDiv.textContent = 'Reconnected to server!';
+    messages.appendChild(reconnectDiv);
+    messages.scrollTop = messages.scrollHeight;
+});
+
+// Handle reconnection failure
+socket.on('reconnect_failed', () => {
+    console.error('Reconnection failed.');
+    const messages = document.getElementById('messages');
+    const failureDiv = document.createElement('div');
+    failureDiv.className = 'system-message error';
+    failureDiv.textContent = 'Reconnection failed. Please reload the page or check your connection.';
+    messages.appendChild(failureDiv);
+    messages.scrollTop = messages.scrollHeight;
+});
+
 // Existing socket event handlers
 socket.on('chat message', (data) => {
     const messages = document.getElementById('messages');
@@ -35,6 +101,15 @@ socket.on('chat message', (data) => {
     messageDiv.className = 'message';
     messageDiv.textContent = `${data.username}: ${data.message}`;
     messages.appendChild(messageDiv);
+    messages.scrollTop = messages.scrollHeight;
+});
+
+socket.on('error-message', (message) => {
+    const messages = document.getElementById('messages');
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'system-message error';
+    errorDiv.textContent = message;
+    messages.appendChild(errorDiv);
     messages.scrollTop = messages.scrollHeight;
 });
 
